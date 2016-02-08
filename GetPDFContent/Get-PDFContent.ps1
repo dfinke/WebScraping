@@ -1,4 +1,5 @@
 $script:dllPath = $MyInvocation.MyCommand.Path
+
 function Get-PDFContent {
     param(
         # file name or url
@@ -6,10 +7,16 @@ function Get-PDFContent {
         $pdfFile
     )    
     
-    $commandPath = Split-Path $dllPath
-    Add-Type -Path "$($commandPath)/itextsharp.dll"
+    $commandPath = Split-Path $dllPath    
+    Add-Type -Path "$($commandPath)/itextsharp.dll"    
 
-    $reader = New-Object iTextSharp.text.pdf.PdfReader $pdfFile    
+    $uri = $pdfFile -as [System.URI] 
+    $testIsURI = $uri.AbsoluteURI -ne $null -and $uri.Scheme -match '[http|https]'
+    if(!$testIsURI) {
+        $pdfFile = (Resolve-Path $pdfFile).path
+    }
+
+    $reader = New-Object iTextSharp.text.pdf.PdfReader $pdfFile
 
     $strategy = New-Object iTextSharp.text.pdf.parser.SimpleTextExtractionStrategy
 
