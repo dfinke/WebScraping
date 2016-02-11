@@ -4,7 +4,8 @@ function Get-PDFContent {
     param(
         # file name or url
         [Parameter(Mandatory=$true)]
-        $pdfFile
+        $pdfFile,
+        $password
     )    
     
     $commandPath = Split-Path $dllPath    
@@ -16,7 +17,13 @@ function Get-PDFContent {
         $pdfFile = (Resolve-Path $pdfFile).path
     }
 
-    $reader = New-Object iTextSharp.text.pdf.PdfReader $pdfFile
+    $pwd = $null
+    
+    if($password) {
+        $pwd=([system.Text.Encoding]::ASCII).GetBytes($password)
+    }
+
+    $reader = New-Object iTextSharp.text.pdf.PdfReader $pdfFile, $pwd
 
     $strategy = New-Object iTextSharp.text.pdf.parser.SimpleTextExtractionStrategy
 
